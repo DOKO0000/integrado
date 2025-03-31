@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de Matrícula</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            flex-direction: column;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input[type="text"] {
+            padding: 10px;
+            margin: 10px 0;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Verificación de Matrícula</h1>
+        <input type="text" id="nombre" placeholder="Ingresa tu nombre">
+        <input type="text" id="apellido" placeholder="Ingresa tu apellido">
+        <input type="text" id="matricula" placeholder="Ingresa tu matrícula">
+        <button onclick="verificarMatricula()">Verificar</button>
+        <p class="error" id="error-message"></p>
+    </div>
+
+    <script>
+        function verificarMatricula() {
+            const nombre = document.getElementById('nombre').value;
+            const apellido = document.getElementById('apellido').value;
+            const matricula = document.getElementById('matricula').value;
+            const errorMessage = document.getElementById('error-message');
+            errorMessage.textContent = '';
+
+            // Validar que todos los campos estén llenos
+            if (!nombre || !apellido || !matricula) {
+                errorMessage.textContent = 'Por favor, completa todos los campos.';
+                return;
+            }
+
+            const url = `https://apps-3.cobachbc.edu.mx/CompetenciasGenericas/Ajax/GetFotoCredencial?pMatricula=${matricula}`;
+
+            // Crear una imagen para verificar si existe
+            const img = new Image();
+            img.src = url;
+
+            img.onload = function() {
+                // Si la imagen se carga correctamente, proceder a la confirmación
+                confirmar(true, matricula, nombre, apellido);
+            };
+
+            img.onerror = function() {
+                // Si la imagen no se carga, mostrar un mensaje de error
+                errorMessage.textContent = 'Matrícula no válida. Por favor, verifica e intenta nuevamente.';
+            };
+        }
+
+        function confirmar(esValido, matricula, nombre, apellido) {
+            if (esValido) {
+                const link = `reconocimiento_facial.html?matricula=${matricula}`; // Redirigir a la página de reconocimiento facial
+                window.location.href = link;
+            }
+        }
+    </script>
+</body>
+</html>
