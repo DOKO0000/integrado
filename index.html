@@ -5,7 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verificación de Matrícula</title>
     <style>
-        /* (Mantener los mismos estilos) */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            flex-direction: column;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input[type="text"] {
+            padding: 10px;
+            margin: 10px 0;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+        .image-container {
+            margin-top: 20px;
+        }
+        .image-container img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+        .confirmation {
+            margin-top: 10px;
+        }
+        .confirmation button {
+            margin: 5px;
+        }
+        .loading {
+            display: none;
+            margin: 10px 0;
+            color: #007bff;
+        }
     </style>
 </head>
 <body>
@@ -15,6 +70,7 @@
         <input type="text" id="apellido" placeholder="Ingresa tu apellido">
         <input type="text" id="matricula" placeholder="Ingresa tu matrícula">
         <button onclick="verificarMatricula()">Verificar</button>
+        <div id="loading" class="loading">Cargando imagen de credencial...</div>
         <p class="error" id="error-message"></p>
     </div>
 
@@ -35,12 +91,15 @@
             const errorMessage = document.getElementById('error-message');
             const imageContainer = document.getElementById('image-container');
             const foto = document.getElementById('foto');
+            const loading = document.getElementById('loading');
             
             errorMessage.textContent = '';
             imageContainer.style.display = 'none';
+            loading.style.display = 'block';
 
             if (!nombre || !apellido || !matricula) {
                 errorMessage.textContent = 'Por favor, completa todos los campos.';
+                loading.style.display = 'none';
                 return;
             }
 
@@ -49,10 +108,11 @@
             img.src = url;
 
             img.onload = function() {
+                loading.style.display = 'none';
                 foto.src = url;
                 imageContainer.style.display = 'block';
                 
-                // Almacenar temporalmente la imagen para usarla en el reconocimiento facial
+                // Almacenar datos para la siguiente página
                 localStorage.setItem('credencialImage', url);
                 localStorage.setItem('matricula', matricula);
                 localStorage.setItem('nombre', nombre);
@@ -60,15 +120,27 @@
             };
 
             img.onerror = function() {
-                errorMessage.textContent = 'Matrícula no válida. Por favor, verifica e intenta nuevamente.';
+                loading.style.display = 'none';
+                errorMessage.textContent = 'Matrícula no válida o error al cargar la imagen. Por favor, verifica e intenta nuevamente.';
             };
         }
 
         function confirmar(esValido) {
             if (esValido) {
+                // Verificar que los datos necesarios están en localStorage
+                if (!localStorage.getItem('credencialImage') {
+                    document.getElementById('error-message').textContent = 'Error: No se pudo cargar la imagen de credencial.';
+                    return;
+                }
+                
                 // Redirigir a la página de reconocimiento facial
                 window.location.href = 'reconocimiento_facial.html';
             } else {
+                // Limpiar localStorage y recargar
+                localStorage.removeItem('credencialImage');
+                localStorage.removeItem('matricula');
+                localStorage.removeItem('nombre');
+                localStorage.removeItem('apellido');
                 window.location.reload();
             }
         }
